@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { isFinePointer } from '../lib/hooks';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+const NBSP = String.fromCharCode(160);
 
 /* 09 — Character Wave */
 export function CharWave() {
@@ -248,7 +249,7 @@ export function LetterRepel() {
     <div className="tw tw--repel" ref={wrap}>
       {letters.map((c, i) => (
         <span className="tw__repelChar" data-letter key={i}>
-          {c === ' ' ? ' ' : c}
+          {c === ' ' ? NBSP : c}
         </span>
       ))}
     </div>

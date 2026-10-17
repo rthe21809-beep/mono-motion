@@ -26,9 +26,10 @@ export function Orbit() {
 }
 
 export function Bars() {
+  const list = Array.from({ length: 9 });
   return (
     <div className="bars">
-      {Array.from({ length: 9 }).map((*, i) => (
+      {list.map((item, i) => (
         <span className="bars__bar" key={i} style={{ animationDelay: `${i * -0.14}s` }} />
       ))}
     </div>
@@ -62,9 +63,10 @@ export function Conic() {
 }
 
 export function Pendulum() {
+  const arms = [0, 1, 2, 3, 4];
   return (
     <svg className="pend" viewBox="0 0 200 200" width="200" height="200" aria-hidden>
-      {[0, 1, 2, 3, 4].map((i) => (
+      {arms.map((i) => (
         <g key={i} className="pend__arm" style={{ animationDelay: `${i * -0.1}s`, opacity: 1 - i * 0.18 }}>
           <line x1="100" y1="26" x2="100" y2="148" stroke="#ededf0" strokeWidth={2 - i * 0.3} strokeLinecap="round" />
           <circle cx="100" cy="148" r={8.5 - i * 1.3} fill="#ededf0" />
@@ -77,14 +79,15 @@ export function Pendulum() {
 
 export function PixelGrid() {
   const N = 9;
-  const cells = Array.from({ length: N * N }, (*, i) => ({
-    i,
-    delay: (Math.floor(i / N) + (i % N)) * 70
-  }));
+  const total = N * N;
+  const cells = [];
+  for (let i = 0; i < total; i++) {
+    cells.push({ i, delay: (Math.floor(i / N) + (i % N)) * 70 });
+  }
   return (
     <div className="px" style={{ gridTemplateColumns: `repeat(${N}, 1fr)` }}>
-      {cells.map(({ i, delay }) => (
-        <span className="px__cell" key={i} style={{ animationDelay: `${delay}ms` }} />
+      {cells.map((c) => (
+        <span className="px__cell" key={c.i} style={{ animationDelay: `${c.delay}ms` }} />
       ))}
     </div>
   );
@@ -102,9 +105,10 @@ export function DashRings() {
 }
 
 export function ElasticDots() {
+  const list = [0, 1, 2, 3, 4, 5];
   return (
     <div className="elastic">
-      {Array.from({ length: 6 }).map((_, i) => (
+      {list.map((i) => (
         <span className="elastic__dot" key={i} style={{ animationDelay: `${i * 0.12}s` }} />
       ))}
     </div>

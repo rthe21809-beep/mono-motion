@@ -1,8 +1,8 @@
-import { useRef, useState } from '''react''';
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from '''framer-motion''';
-import { isFinePointer, useActive } from '''../lib/hooks''';
+import { useRef, useState } from 'react';
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { isFinePointer, useActive } from '../lib/hooks';
 
-const SPRING = { type: '''spring''', stiffness: 320, damping: 26, mass: 0.6 } as const;
+const SPRING = { type: 'spring', stiffness: 320, damping: 26, mass: 0.6 } as const;
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* 01 — Magnetic Pull */
@@ -90,7 +90,7 @@ export function LiquidRise() {
     <button className="mm-liquid" {...bind}>
       <motion.span
         className="mm-liquid__fill"
-        animate={{ y: active ? '''0%''' : '''101%''' }}
+        animate={{ y: active ? '0%' : '101%' }}
         transition={{ duration: 0.62, ease: EASE }}
       >
         <svg className="mm-liquid__wave" viewBox="0 0 240 14" preserveAspectRatio="none">
@@ -112,7 +112,7 @@ export function SplitStack() {
     <button className="mm-split" {...bind}>
       <motion.span
         className="mm-split__inner"
-        animate={{ y: active ? '''-50%''' : '''0%''' }}
+        animate={{ y: active ? '-50%' : '0%' }}
         transition={{ duration: 0.5, ease: EASE }}
       >
         <span className="mm-split__line">Split</span>
@@ -158,8 +158,8 @@ export function DepthPress() {
       animate={{
         y: down ? 5 : 0,
         boxShadow: down
-          ? '''0 1px 0 0 #2e2e36, 0 2px 8px rgba(0,0,0,.6)'''
-          : '''0 7px 0 0 #2e2e36, 0 14px 24px rgba(0,0,0,.55)'''
+          ? '0 1px 0 0 #2e2e36, 0 2px 8px rgba(0,0,0,.6)'
+          : '0 7px 0 0 #2e2e36, 0 14px 24px rgba(0,0,0,.55)'
       }}
       transition={SPRING}
       onPointerDown={() => setDown(true)}
@@ -182,15 +182,15 @@ export function MorphPill() {
       animate={{
         width: active ? 228 : 152,
         borderRadius: active ? 22 : 999,
-        backgroundColor: active ? '''#ededf0''' : '''#121216'''
+        backgroundColor: active ? '#ededf0' : '#121216'
       }}
       transition={{ duration: 0.55, ease: EASE }}
     >
       <motion.span
         className="mm-pill__label"
         animate={{
-          color: active ? '''#08080a''' : '''#ededf0''',
-          letterSpacing: active ? '''0.16em''' : '''0.04em'''
+          color: active ? '#08080a' : '#ededf0',
+          letterSpacing: active ? '0.16em' : '0.04em'
         }}
         transition={{ duration: 0.4 }}
       >
@@ -204,7 +204,7 @@ export function MorphPill() {
 export function SliceGlitch() {
   const { active, bind } = useActive();
   return (
-    <button className={'''mm-glitch''' + (active ? ''' is-on''' : '''''')} {...bind}>
+    <button className={active ? 'mm-glitch is-on' : 'mm-glitch'} {...bind}>
       <span className="mm-glitch__base">Glitch</span>
       <span className="mm-glitch__layer mm-glitch__layer--a" aria-hidden>Glitch</span>
       <span className="mm-glitch__layer mm-glitch__layer--b" aria-hidden>Glitch</span>

@@ -1,101 +1,77 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import gsap from 'gsap';
-import { isFinePointer } from '../lib/hooks';
+import { useFinePointer } from '../lib/hooks';
+import { EASE_IN_OUT, EASE_OUT } from '../lib/motion';
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-const NBSP = String.fromCharCode(160);
-
-/* 09 — Character Wave */
-export function CharWave() {
-  const [key, setKey] = useState(0);
+export function LetterWave() {
   const word = 'RIPPLE';
   return (
-    <button className="tw" onClick={() => setKey((k) => k + 1)} aria-label="Replay">
-      <span className="tw__row">
-        {word.split('').map((c, i) => (
-          <motion.span
-            key={key + '-' + i}
-            className="tw__char"
-            initial={{ y: 0 }}
-            animate={{ y: [0, -34, 0] }}
-            transition={{
-              duration: 0.95,
-              delay: i * 0.065,
-              ease: EASE,
-              repeat: Infinity,
-              repeatDelay: 1.4
-            }}
-          >
-            {c}
-          </motion.span>
-        ))}
-      </span>
-    </button>
-  );
-}
-
-/* 10 — Type Loop */
-export function TypeLoop() {
-  const phrase = 'handmade motion';
-  const [n, setN] = useState(0);
-  const [dir, setDir] = useState<1 | -1>(1);
-
-  useEffect(() => {
-    const hold = n === phrase.length && dir === 1;
-    const wait = hold ? 1200 : n === 0 && dir === -1 ? 600 : 62;
-    const t = window.setTimeout(() => {
-      if (dir === 1) {
-        if (n < phrase.length) setN(n + 1);
-        else setDir(-1);
-      } else {
-        if (n > 0) setN(n - 1);
-        else setDir(1);
-      }
-    }, wait);
-    return () => window.clearTimeout(t);
-  }, [n, dir, phrase.length]);
-
-  return (
-    <div className="tw tw--mono" aria-label={phrase}>
-      <span>{phrase.slice(0, n)}</span>
-      <motion.span
-        className="tw__caret"
-        animate={{ opacity: [1, 1, 0, 0] }}
-        transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: 'linear' }}
-      />
+    <div className="txt txt--wave" aria-label={word}>
+      {word.split('').map((c, i) => (
+        <motion.span
+          key={i}
+          className="txt__ch"
+          animate={{ y: [0, -16, 0] }}
+          transition={{ duration: 1.8, delay: i * 0.055, ease: EASE_IN_OUT, repeat: Infinity, repeatDelay: 0.5 }}
+        >
+          {c}
+        </motion.span>
+      ))}
     </div>
   );
 }
 
-/* 11 — Mask Reveal */
-export function MaskReveal() {
-  const lines = ['Every frame', 'is drawn', 'by hand'];
-  const [key, setKey] = useState(0);
+export function Typewriter() {
+  const phrase = 'handmade motion';
+  const [n, setN] = useState(0);
+  const [dir, setDir] = useState<1 | -1>(1);
+  useEffect(() => {
+    const atEnd = n === phrase.length && dir === 1;
+    const atStart = n === 0 && dir === -1;
+    const wait = atEnd ? 1400 : atStart ? 700 : 68;
+    const t = window.setTimeout(() => {
+      if (dir === 1) {
+        if (n < phrase.length) setN(n + 1);
+        else setDir(-1);
+      } else if (n > 0) setN(n - 1);
+      else setDir(1);
+    }, wait);
+    return () => window.clearTimeout(t);
+  }, [n, dir, phrase.length]);
   return (
-    <button className="tw tw--stack" onClick={() => setKey((k) => k + 1)} aria-label="Replay">
+    <div className="txt txt--mono" aria-label={phrase}>
+      <span>{phrase.slice(0, n)}</span>
+      <motion.span className="txt__caret" animate={{ opacity: [1, 1, 0, 0] }} transition={{ duration: 1.1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: 'linear' }} />
+    </div>
+  );
+}
+
+export function LineReveal() {
+  const lines = ['Every frame', 'is drawn', 'by hand'];
+  return (
+    <div className="txt txt--lines">
       {lines.map((l, i) => (
-        <span className="tw__mask" key={key + '-' + i}>
+        <span className="line-mask" key={i}>
           <motion.span
-            className="tw__maskline"
-            initial={{ y: '110%' }}
+            className="line-mask__inner"
+            initial={{ y: '115%' }}
             animate={{ y: '0%' }}
-            transition={{ duration: 1, delay: 0.09 * i, ease: EASE }}
+            transition={{ duration: 0.9, delay: 0.1 + i * 0.11, ease: EASE_OUT }}
           >
             {l}
           </motion.span>
         </span>
       ))}
-    </button>
+    </div>
   );
 }
 
-/* 12 — Scramble Decode */
-const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*+-';
+const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*+-=/';
 
 export function Scramble() {
   const target = 'DECODE';
-  const [display, setDisplay] = useState(target.split(''));
+  const [chars, setChars] = useState(target.split(''));
   const frame = useRef(0);
   const raf = useRef(0);
 
@@ -105,14 +81,8 @@ export function Scramble() {
     const tick = () => {
       frame.current += 1;
       const f = frame.current;
-      setDisplay(
-        target.split('').map((c, i) => {
-          if (c === ' ') return ' ';
-          if (f > i * 5 + 14) return c;
-          return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-        })
-      );
-      if (f < target.length * 5 + 20) raf.current = requestAnimationFrame(tick);
+      setChars(target.split('').map((c, i) => (f > i * 4 + 16 ? c : GLYPHS[Math.floor(Math.random() * GLYPHS.length)])));
+      if (f < target.length * 4 + 22) raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
   };
@@ -123,71 +93,58 @@ export function Scramble() {
   }, []);
 
   return (
-    <button className="tw tw--mono" onClick={run} aria-label="Replay">
-      {display.join('')}
+    <button className="txt txt--mono" onClick={run} aria-label="Replay">
+      {chars.join('')}
     </button>
   );
 }
 
-/* 13 — Sheen Chrome */
-export function SheenText() {
+export function GradientSweep() {
   return (
-    <div className="tw__sheenWrap">
-      <span className="tw__sheen">CHROME</span>
+    <div className="txt__sweepWrap">
+      <span className="txt__sweep">CHROME</span>
     </div>
   );
 }
 
-/* 14 — Counter Marquee */
-export function CounterMarquee() {
+export function DualMarquee() {
   const top = useRef<HTMLDivElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
-
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to(top.current, { xPercent: -50, duration: 18, ease: 'none', repeat: -1 });
-      gsap.fromTo(
-        bottom.current,
-        { xPercent: -50 },
-        { xPercent: 0, duration: 22, ease: 'none', repeat: -1 }
-      );
+      gsap.to(top.current, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
+      gsap.fromTo(bottom.current, { xPercent: -50 }, { xPercent: 0, duration: 26, ease: 'none', repeat: -1 });
     });
     return () => ctx.revert();
   }, []);
-
-  const row = Array.from({ length: 8 }).map((_, i) => (
-    <span className="tw__mqItem" key={i}>
-      MONO<span className="tw__mqDot">/</span>
-    </span>
+  const row = Array.from({ length: 6 }).map((_, i) => (
+    <span className="mq__item" key={i}>MONO<span className="mq__dot">/</span></span>
   ));
-
   return (
-    <div className="tw__mq">
-      <div className="tw__mqRow" ref={top}>{row}{row}</div>
-      <div className="tw__mqRow tw__mqRow--outline" ref={bottom}>{row}{row}</div>
+    <div className="mq">
+      <div className="mq__row" ref={top}>{row}{row}</div>
+      <div className="mq__row mq__row--outline" ref={bottom}>{row}{row}</div>
     </div>
   );
 }
 
-/* 15 — Flip Words */
-export function FlipWords() {
+export function WordFlip() {
   const words = ['FLIP', 'TURN', 'SPIN', 'ROLL'];
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = window.setInterval(() => setI((v) => (v + 1) % words.length), 1900);
+    const t = window.setInterval(() => setI((v) => (v + 1) % words.length), 2000);
     return () => window.clearInterval(t);
   }, [words.length]);
-
   return (
-    <div className="tw__flip">
+    <div className="flip">
       <AnimatePresence mode="wait">
         <motion.span
           key={words[i]}
-          className="tw__flipWord"
-          initial={{ rotateX: -92, opacity: 0, y: '40%' }}
+          className="flip__word"
+          initial={{ rotateX: -88, opacity: 0, y: '35%' }}
           animate={{ rotateX: 0, opacity: 1, y: '0%' }}
-          exit={{ rotateX: 92, opacity: 0, y: '-40%' }}
-          transition={{ duration: 0.62, ease: EASE }}
+          exit={{ rotateX: 88, opacity: 0, y: '-35%' }}
+          transition={{ duration: 0.55, ease: EASE_OUT }}
         >
           {words[i]}
         </motion.span>
@@ -196,9 +153,9 @@ export function FlipWords() {
   );
 }
 
-/* 16 — Letter Repel */
 export function LetterRepel() {
   const wrap = useRef<HTMLDivElement>(null);
+  const fine = useFinePointer();
   const letters = useMemo(() => 'PUSH AWAY'.split(''), []);
 
   useEffect(() => {
@@ -208,49 +165,52 @@ export function LetterRepel() {
     let raf = 0;
     let px = -9999;
     let py = -9999;
+    let t = 0;
 
     const apply = () => {
       raf = 0;
-      for (const n of nodes) {
+      t += 0.016;
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
         const r = n.getBoundingClientRect();
-        const dx = r.left + r.width / 2 - px;
-        const dy = r.top + r.height / 2 - py;
-        const d = Math.hypot(dx, dy);
-        const force = Math.max(0, 1 - d / 190);
-        const ox = (dx / (d || 1)) * force * 42;
-        const oy = (dy / (d || 1)) * force * 42;
-        n.style.transform = 'translate3d(' + ox.toFixed(2) + 'px, ' + oy.toFixed(2) + 'px, 0)';
+        let ox = 0;
+        let oy = 0;
+        if (fine) {
+          const dx = r.left + r.width / 2 - px;
+          const dy = r.top + r.height / 2 - py;
+          const d = Math.hypot(dx, dy);
+          const force = Math.max(0, 1 - d / 180);
+          ox = (dx / (d || 1)) * force * 34;
+          oy = (dy / (d || 1)) * force * 34;
+        } else {
+          oy = Math.sin(t * 1.6 + i * 0.5) * 4;
+        }
+        n.style.transform = `translate3d(${ox.toFixed(2)}px, ${oy.toFixed(2)}px, 0)`;
       }
     };
 
+    const loop = () => { if (!raf) raf = requestAnimationFrame(apply); };
     const onMove = (e: PointerEvent) => {
-      if (!isFinePointer()) return;
-      px = e.clientX;
-      py = e.clientY;
-      if (!raf) raf = requestAnimationFrame(apply);
+      if (e.pointerType !== 'mouse') return;
+      px = e.clientX; py = e.clientY; loop();
     };
+    const onLeave = () => { px = -9999; py = -9999; loop(); };
 
-    const reset = () => {
-      px = -9999;
-      py = -9999;
-      if (!raf) raf = requestAnimationFrame(apply);
-    };
-
+    const id = window.setInterval(loop, fine ? 250 : 16);
     window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerleave', reset);
+    window.addEventListener('pointerleave', onLeave);
     return () => {
+      window.clearInterval(id);
       window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerleave', reset);
+      window.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [fine]);
 
   return (
-    <div className="tw tw--repel" ref={wrap}>
+    <div className="txt txt--repel" ref={wrap}>
       {letters.map((c, i) => (
-        <span className="tw__repelChar" data-letter key={i}>
-          {c === ' ' ? NBSP : c}
-        </span>
+        <span className="txt__repelCh" data-letter key={i}>{c === ' ' ? ' ' : c}</span>
       ))}
     </div>
   );
